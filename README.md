@@ -313,7 +313,7 @@ export default IndexView;
 ```
 
 ### Login Page
-In this page, we will show a form to log in with email and password. We will use Altogic's altogic.auth.signInWithEmail() function to log in. 
+In this page, we will show a form to log in with email and password. We will use Altogic's altogic.auth.signInWithEmail() function to log in. We will save session and user infos to state and storage if signInWithEmail function return success. Then user will be redirected to profile page.
 
 Replacing pages/sign-in.js with the following code:
 ```javascript
@@ -399,7 +399,11 @@ export default SignInView;
 ```
 
 ### Register Page
-In this page, we will show a form to sign up with email and password. We will use Altogic's altogic.auth.signUpWithEmail() function to log in.
+In this page, we will show a form to sign up with email and password. We will use Altogic's altogic.auth.signUpWithEmail() function to log in. 
+
+We will save session and user infos to state and storage if signUpWithEmail function return user. Then user will be redirected to profile page.
+
+If signUpWithEmail does not return user, it means user need to confirm email so we will show the success message. 
 
 Replacing pages/sign-up.js with the following code:
 ```javascript
@@ -504,12 +508,13 @@ export default SignUpView;
 ```
 
 ### Profile Page
-In this page, we will show the user's profile.
+In this page, we will show the user's profile and We will use Altogic's altogic.auth.signOut() function to log out. 
+
+We will remove session and user infos from state and storage if signOut function return success. Then user will be redirected to login page.
 
 Replacing pages/profile.js with the following code:
 ```javascript
 // /src/pages/profile.js
-import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import Avatar from "../components/Avatar";
 import Sessions from "../components/Sessions";
@@ -517,12 +522,9 @@ import UserInfo from "../components/UserInfo";
 import altogic from "../configs/altogic";
 import { useAuthContext } from "../contexts/Auth.context";
 
-function ProfileView({ userProp, sessionsProp }) {
+function ProfileView() {
   const { setAuth, setSession } = useAuthContext();
   const navigate = useNavigate();
-
-  const [user, setUser] = useState(userProp);
-  const [sessions, setSessions] = useState(sessionsProp);
 
   const handleSignOut = async () => {
     try {
@@ -542,9 +544,9 @@ function ProfileView({ userProp, sessionsProp }) {
 
   return (
     <section className="h-screen py-4 space-y-4 flex flex-col text-center items-center">
-      <Avatar user={user} setUser={setUser} />
-      <UserInfo user={user} setUser={setUser} />
-      <Sessions sessions={sessions} setSessions={setSessions} />
+      <Avatar />
+      <UserInfo />
+      <Sessions />
       <button
         className="bg-gray-400 rounded py-2 px-3 text-white"
         onClick={handleSignOut}
@@ -560,6 +562,8 @@ export default ProfileView;
 
 ### Auth Redirect Page
 We use this page for verify the user's email address and **Login With Magic Link Authentication.**
+
+We will use Altogic's altogic.auth.getAuthGrant() function to log in with handled token from url. 
 
 Replacing pages/auth-redirect.js with the following code:
 ```javascript
