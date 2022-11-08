@@ -21,17 +21,24 @@ If you are new to React applications, this tutorial is definitely for you to und
 
 
 ## Prerequisites
-* Altogic account (if you have not one yet, you can create an account by sign-in up to **Altogic**)
-* Familiarity with the command line
-* Any text editor or IDE (WebStorm, VsCode, Sublime, Atom, etc.)
-* Basic knowledge of Javascript
-* Basic knowledge of React
+To complete this tutorial, make sure you have installed the following tools and utilities on your local development environment.
+
+- [VsCode](https://code.visualstudio.com/download)
+- [NodeJS](https://nodejs.org/en/download/)
+- [React Native Enviroments](https://reactnative.dev/docs/environment-setup)
+- You also need an Altogic Account. If you do not have one, you can create an account by [signin up for Altogic](https://designer.altogic.com/).
+
+## How email-based sign-up works in Altogic
+By default, when you create an app in Altogic, email-based authentication is enabled. In addition, during email-based authentication, the email address of the user is also verified. Below you can find the flow of email and password-based sign-up process.
+
+![Auth Flow](github/13-auth-flow.png)
+
+If email verification is disabled, then after step 2, Altogic immediately returns a new session to the user, meaning that steps after step #2 in the above flow are not executed. You can easily configure email-based authentication settings from the App Settings > Authentication in Altogic Designer. One critical parameter you need to specify is the Redirect URL, you can also customize this parameter from App Settings > Authentication. Finally, you can also customize the email message template from the App Settings > Authentication > Messaget Templates.
 
 ## Creating an Altogic App
-We will use Altogic as a backend service platform, so let’s visit [Altogic Designer](https://designer.altogic.com/) and create an account.
-![Application](github/1-applications.png)
-
 After creating an account, you will see the workspace where you can access your apps.
+
+![Application](github/1-applications.png)
 
 Click + New app and follow the instructions;
 
@@ -42,23 +49,25 @@ Click + New app and follow the instructions;
 
 ![Create App](github/2-create-app.png)
 
-Then click Next and select Basic Authentication template. This template is creates a default user model for your app which is required by [Altogic Client Library](https://github.com/altogic/altogic-js) to store user data and manage authentication.
+Then click Next and select Basic template. **This template creates a default user data model for your app which is required by [Altogic Client Library](https://www.npmjs.com/package/altogic) to store user data and manage authentication.** You can add additional user fields to this data model (e.g., name, surname, gender, birthdate) and when calling the `signUpWithEmail` method of the client library you can pass these additional data.
 
-Then click Next and select Basic Authentication template. This template is based on session authentication and highly recommended to secure your apps.
 ![Choose Template](github/3-choose-template.png)
+
+> **Tip:** If you do not select the basic template, instead selected the blank app template the user data model will not be created for your app. In order to use the Altogic Client Library's authentication methods you need a user data model to store the user data. You can easily create a new data model manually and from the **App Settings > Authentication** mark this new data model as your user data model. 
 
 Then click Next to confirm and create an app.
 
-Awesome! We have created our application; now click/tap on the **newly created app to launch the Designer.**
+Awesome! We have created our application; now click/tap on the <strong>newly created app to launch the Designer.</strong> In order to access the app and use the Altogic client library, we should get `envUrl` and `clientKey` of this app. You can use any one of the API base URLs specified for your app environment as your envUrl.
 
-> This is the only configuration we need to do in Altogic Designer. In order to access the app and use the Altogic client library, we should get envUrl and clientKey of this app.
-Click the **Home** icon at the left sidebar to copy the envUrl and clientKey.
+Click the <strong>Home</strong> icon at the left sidebar to copy the `envUrl` and `clientKey`.
 
 ![Client Keys](github/4-client-keys.png)
 
+## Confirm Email
+
 Once the user created successfully, our React app will route the user to the Verification page, and a verification email will be sent to the user’s email address. When the user clicks the link in the mail, the user will navigate to the redirect page to grant authentication rights. After successfully creating a session on the Redirect page, users will be redirected to the Home page.
 
-## Quick Tip
+### Quick Tip
 > If you want, you can deactivate or customize the mail verification from **App Settings -> Authentication** in Logic Designer.
 
 ## Create a React project
@@ -85,6 +94,7 @@ Open altogic.js and paste below code block to export the altogic client instance
 /src/configs/altogic.js
 
 ```javascript
+// /src/configs/altogic.js
 import { createClient } from "altogic";
 
 // This `envUrl` and `clientKey` is sample you need to create your own.
@@ -107,6 +117,7 @@ Let’s create contexts/ folder inside of the src/ directory to add Auth.context
 
 Open Auth.context.js and copy following code.
 ```javascript
+// /src/contexts/Auth.context.js
 import React, { useState, useEffect, useContext } from "react";
 import altogic from "../configs/altogic";
 
@@ -182,9 +193,10 @@ export default Provider;
 ## Create Routes
 
 ### Private Route Component
-To secure the application and authorize users to access specified routes let’s create PrivateRoute.js inside the components directory and paste the code below.
+To secure the application and authorize users to access specified routes let’s create components/ folder inside of the src/ directory to add PrivateRoute.js and paste the code below.
 
 ```javascript
+// /src/components/PrivateRoute.js
 import { useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { useAuthContext } from "../contexts/Auth.context";
@@ -220,9 +232,12 @@ export default PrivateRoute;
 
 Now we can wrap necessary routes with the PrivateRoute component to specify access in the App.js. Let’s open it and wrap our Profile page with the PrivateRoute as the screen below.
 
+> Firstly, you need to install [React Router Dom](https://reactrouter.com/en/main). It's a routing library for react applications.
+
 Here also you can copy the code;
 
 ```js
+// /src/App.js
 import { BrowserRouter as Router, Route, Routes } from "react-router-dom";
 import PrivateRoute from "./components/PrivateRoute";
 
@@ -269,8 +284,14 @@ Let's create some views in **src/pages/** folder as below:
 * magic-link.js
 * profile.js
 
-### Replacing pages/index.js with the following code:
+![Foldering](github/14-foldering.png)
+
+### Index Page
+In this page, we will show Login, Login With Magic Link and Register buttons.
+
+Replacing pages/index.js with the following code:
 ```javascript
+// /src/pages/index.js
 import { Link } from "react-router-dom";
 
 function IndexView() {
@@ -291,8 +312,12 @@ function IndexView() {
 export default IndexView;
 ```
 
-### Replacing pages/sign-in.js with the following code:
+### Login Page
+In this page, we will show a form to log in with email and password. We will use Altogic's altogic.auth.signInWithEmail() function to log in. 
+
+Replacing pages/sign-in.js with the following code:
 ```javascript
+// /src/pages/sign-in.js
 import { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import altogic from "../configs/altogic";
@@ -373,82 +398,12 @@ function SignInView() {
 export default SignInView;
 ```
 
-### Replacing pages/magic-link.js with the following code:
+### Register Page
+In this page, we will show a form to sign up with email and password. We will use Altogic's altogic.auth.signUpWithEmail() function to log in.
+
+Replacing pages/sign-up.js with the following code:
 ```javascript
-import { useState } from "react";
-import { Link } from "react-router-dom";
-import altogic from "../configs/altogic";
-
-function MagicLinkView() {
-  const [inpEmail, setInpEmail] = useState("");
-
-  const [success, setSuccess] = useState("");
-  const [errors, setErrors] = useState(null);
-  const [loading, setLoading] = useState(false);
-
-  async function loginHandler() {
-    setLoading(true);
-    setErrors(null);
-
-    const { errors: apiErrors } = await altogic.auth.sendMagicLinkEmail(
-      inpEmail
-    );
-    setLoading(false);
-
-    if (apiErrors) {
-      setErrors(apiErrors.items);
-    } else {
-      setInpEmail("");
-      setSuccess("Email sent! Check your inbox.");
-    }
-  }
-
-  return (
-    <section className="flex flex-col items-center justify-center h-96 gap-4">
-      <div className="flex flex-col gap-2 w-full md:w-96">
-        <h1 className="self-start text-3xl font-bold">Login with magic link</h1>
-        {success && (
-          <div className="bg-green-600 text-white text-[13px] p-2">
-            {success}
-          </div>
-        )}
-        {errors && (
-          <div className="bg-red-600 text-white text-[13px] p-2">
-            {errors.map(({ message }) => (
-              <p key={message}>{message}</p>
-            ))}
-          </div>
-        )}
-
-        <input
-          type="email"
-          placeholder="Type your email"
-          onChange={(e) => setInpEmail(e.target.value)}
-          value={inpEmail}
-        />
-        <div className="flex justify-between gap-4">
-          <Link className="text-indigo-600" to="/sign-up">
-            Don't have an account? Register now
-          </Link>
-          <button
-            disabled={loading}
-            type="submit"
-            className="border py-2 px-3 border-gray-500 hover:bg-gray-500 hover:text-white transition shrink-0"
-            onClick={loginHandler}
-          >
-            Send magic link
-          </button>
-        </div>
-      </div>
-    </section>
-  );
-}
-
-export default MagicLinkView;
-```
-
-### Replacing pages/sign-up.js with the following code:
-```javascript
+// /src/pages/sign-up.js
 import { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import altogic from "../configs/altogic";
@@ -548,8 +503,12 @@ function SignUpView() {
 export default SignUpView;
 ```
 
-### Replacing pages/profile.js with the following code:
+### Profile Page
+In this page, we will show the user's profile.
+
+Replacing pages/profile.js with the following code:
 ```javascript
+// /src/pages/profile.js
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import Avatar from "../components/Avatar";
@@ -599,8 +558,12 @@ function ProfileView({ userProp, sessionsProp }) {
 export default ProfileView;
 ```
 
-### Replacing pages/auth-redirect.js with the following code:
+### Auth Redirect Page
+We use this page for verify the user's email address and **Login With Magic Link Authentication.**
+
+Replacing pages/auth-redirect.js with the following code:
 ```javascript
+// /src/pages/auth-redirect.js
 import { useEffect } from "react";
 import { useNavigate, useLocation } from "react-router-dom";
 import altogic from "../configs/altogic";
@@ -640,15 +603,98 @@ function AuthRedirectView() {
 export default AuthRedirectView;
 ```
 
+### Login With Magic Link Page
+In this page, we will show a form to log in with Magic Link with only email. We will use Altogic's altogic.auth.sendMagicLinkEmail() function to log in.
+
+### How login With Magic Link Works
+
+If there is a user matching the entered email address, this function sends a link to that user by mail. and if the link in the e-mail is clicked, the user is logged in.
+
+```javascript
+// /src/pages/magic-link.js
+import { useState } from "react";
+import { Link } from "react-router-dom";
+import altogic from "../configs/altogic";
+
+function MagicLinkView() {
+  const [inpEmail, setInpEmail] = useState("");
+
+  const [success, setSuccess] = useState("");
+  const [errors, setErrors] = useState(null);
+  const [loading, setLoading] = useState(false);
+
+  async function loginHandler() {
+    setLoading(true);
+    setErrors(null);
+
+    const { errors: apiErrors } = await altogic.auth.sendMagicLinkEmail(
+      inpEmail
+    );
+    setLoading(false);
+
+    if (apiErrors) {
+      setErrors(apiErrors.items);
+    } else {
+      setInpEmail("");
+      setSuccess("Email sent! Check your inbox.");
+    }
+  }
+
+  return (
+    <section className="flex flex-col items-center justify-center h-96 gap-4">
+      <div className="flex flex-col gap-2 w-full md:w-96">
+        <h1 className="self-start text-3xl font-bold">Login with magic link</h1>
+        {success && (
+          <div className="bg-green-600 text-white text-[13px] p-2">
+            {success}
+          </div>
+        )}
+        {errors && (
+          <div className="bg-red-600 text-white text-[13px] p-2">
+            {errors.map(({ message }) => (
+              <p key={message}>{message}</p>
+            ))}
+          </div>
+        )}
+
+        <input
+          type="email"
+          placeholder="Type your email"
+          onChange={(e) => setInpEmail(e.target.value)}
+          value={inpEmail}
+        />
+        <div className="flex justify-between gap-4">
+          <Link className="text-indigo-600" to="/sign-up">
+            Don't have an account? Register now
+          </Link>
+          <button
+            disabled={loading}
+            type="submit"
+            className="border py-2 px-3 border-gray-500 hover:bg-gray-500 hover:text-white transition shrink-0"
+            onClick={loginHandler}
+          >
+            Send magic link
+          </button>
+        </div>
+      </div>
+    </section>
+  );
+}
+
+export default MagicLinkView;
+```
+
 ## Updating User Info
+In this components, we will use Altogic's database operations to update the user fields and managing sessions.
+
 
 Let's create some components in **src/components/** folder as below:
 * UserInfo.js
 * Sessions.js
 
-### Replacing components/UserInfo.js with the following code:
-
+Replacing components/UserInfo.js with the following code:
 ```js
+// /src/components/UserInfo.js
 import { useRef, useState } from "react";
 import altogic from "../configs/altogic";
 import { useAuthContext } from "../contexts/Auth.context";
@@ -714,8 +760,9 @@ function UserInfo() {
 export default UserInfo;
 ```
 
-### Replacing components/Sessions.js with the following code:
+Replacing components/Sessions.js with the following code:
 ```js
+// /src/components/Sessions.js
 import { useEffect, useState } from "react";
 import altogic from "../configs/altogic";
 import { useAuthContext } from "../contexts/Auth.context";
@@ -787,7 +834,7 @@ export default Sessions;
 Let's create a Avatar component for user can upload a profile photo. 
 
 ```javascript
-// components/Avatar.js
+// /src/components/Avatar.js
 import { useState } from "react";
 import altogic from "../configs/altogic";
 import { useAuthContext } from "../contexts/Auth.context";
