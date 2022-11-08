@@ -25,7 +25,7 @@ To complete this tutorial, make sure you have installed the following tools and 
 
 - [VsCode](https://code.visualstudio.com/download)
 - [NodeJS](https://nodejs.org/en/download/)
-- [React Native Enviroments](https://reactnative.dev/docs/environment-setup)
+- [React](https://reactjs.org/)
 - You also need an Altogic Account. If you do not have one, you can create an account by [signin up for Altogic](https://designer.altogic.com/).
 
 ## How email-based sign-up works in Altogic
