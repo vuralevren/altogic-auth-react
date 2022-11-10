@@ -68,7 +68,7 @@ Once the user created successfully, our React app will route the user to the Ver
 
 ![Mail](github/15-mail.png)
 
-We have changed redirect url as `http://localhost:3000/auth-redirect`
+We have changed the redirect URL to `http://localhost:3000/auth-redirect`
 
 ## Create a React project
 ```bash
