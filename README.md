@@ -19,21 +19,20 @@ After completion of this tutorial, you will learn:
 
 If you are new to React applications, this tutorial is definitely for you to understand the basics and even advanced concepts.
 
+## How email-based sign-up works in Altogic
+By default, when you create an app in Altogic, email-based authentication is enabled. In addition, during email-based authentication, the user's email address is also verified. Below you can find the flow of email and password-based sign-up process.
+
+![Auth Flow](github/13-auth-flow.png)
+
+If email verification is disabled, then after step 2, Altogic immediately returns a new session to the user, meaning that steps after step #2 in the above flow are not executed. You can easily configure email-based authentication settings from the App Settings > Authentication in Altogic Designer. You need to specify one critical parameter, the Redirect URL; you can customize this parameter from App Settings > Authentication. Finally, you can customize the email message template from the App Settings > Authentication > Message Templates.
 
 ## Prerequisites
-To complete this tutorial, make sure you have installed the following tools and utilities on your local development environment.
+To complete this tutorial, ensure you have installed the following tools and utilities on your local development environment.
 
 - [VsCode](https://code.visualstudio.com/download)
 - [NodeJS](https://nodejs.org/en/download/)
 - [React](https://reactjs.org/)
 - You also need an Altogic Account. If you do not have one, you can create an account by [signin up for Altogic](https://designer.altogic.com/).
-
-## How email-based sign-up works in Altogic
-By default, when you create an app in Altogic, email-based authentication is enabled. In addition, during email-based authentication, the email address of the user is also verified. Below you can find the flow of email and password-based sign-up process.
-
-![Auth Flow](github/13-auth-flow.png)
-
-If email verification is disabled, then after step 2, Altogic immediately returns a new session to the user, meaning that steps after step #2 in the above flow are not executed. You can easily configure email-based authentication settings from the App Settings > Authentication in Altogic Designer. One critical parameter you need to specify is the Redirect URL, you can also customize this parameter from App Settings > Authentication. Finally, you can also customize the email message template from the App Settings > Authentication > Message Templates.
 
 ## Creating an Altogic App
 After creating an account, you will see the workspace where you can access your apps.
@@ -63,12 +62,13 @@ Click the <strong>Home</strong> icon at the left sidebar to copy the `envUrl` an
 
 ![Client Keys](github/4-client-keys.png)
 
-## Confirm Email
-
 Once the user created successfully, our React app will route the user to the Verification page, and a verification email will be sent to the user’s email address. When the user clicks the link in the mail, the user will navigate to the redirect page to grant authentication rights. After successfully creating a session on the Redirect page, users will be redirected to the Home page.
 
-### Quick Tip
 > If you want, you can deactivate or customize the mail verification from **App Settings -> Authentication** in Logic Designer.
+
+![Mail](github/15-mail.png)
+
+We have changed redirect url as `http://localhost:3000/auth-redirect`
 
 ## Create a React project
 ```bash
@@ -87,11 +87,11 @@ npm install altogic
 yarn add altogic
 ```
 
-Let’s create a configs/ folder inside of the src/ directory to add altogic.js file.
+Let’s create a configs/ folder inside of the src/ directory to add `altogic.js` file.
 
-Open altogic.js and paste below code block to export the altogic client instance.
+Open `altogic.js` and paste below code block to export the altogic client instance.
 
-/src/configs/altogic.js
+`/src/configs/altogic.js`
 
 ```javascript
 // /src/configs/altogic.js
@@ -113,9 +113,9 @@ We need to share data across our components. We can use this hook throughout our
 
 > The React Context API is a state management tool used for sharing data across React components.
 
-Let’s create contexts/ folder inside of the src/ directory to add Auth.context.js file inside it.
+Let’s create contexts/ folder inside of the src/ directory to add `Auth.context.js` file inside it.
 
-Open Auth.context.js and copy following code.
+Open `Auth.context.js` and copy following code.
 ```javascript
 // /src/contexts/Auth.context.js
 import React, { useState, useEffect, useContext } from "react";
@@ -193,7 +193,7 @@ export default Provider;
 ## Create Routes
 
 ### Private Route Component
-To secure the application and authorize users to access specified routes let’s create components/ folder inside of the src/ directory to add PrivateRoute.js and paste the code below.
+To secure the application and authorize users to access specified routes let’s create components/ folder inside of the src/ directory to add `PrivateRoute.js` and paste the code below.
 
 ```javascript
 // /src/components/PrivateRoute.js
@@ -230,7 +230,7 @@ export default PrivateRoute;
 
 > Previously we have created our authentication context to use user information. And, here, we are controlling session to route users, whether the Login page or the children.
 
-Now we can wrap necessary routes with the PrivateRoute component to specify access in the App.js. Let’s open it and wrap our Profile page with the PrivateRoute as the screen below.
+Now we can wrap necessary routes with the PrivateRoute component to specify access in the `App.js`. Let’s open it and wrap our Profile page with the PrivateRoute as the screen below.
 
 > Firstly, you need to install [React Router Dom](https://reactrouter.com/en/main). It's a routing library for react applications.
 
@@ -289,7 +289,7 @@ Let's create some views in **src/pages/** folder as below:
 ### Index Page
 In this page, we will show Login, Login With Magic Link and Register buttons.
 
-Replacing pages/index.js with the following code:
+Replacing `pages/index.js` with the following code:
 ```javascript
 // /src/pages/index.js
 import { Link } from "react-router-dom";
@@ -313,9 +313,9 @@ export default IndexView;
 ```
 
 ### Login Page
-In this page, we will show a form to log in with email and password. We will use Altogic's altogic.auth.signInWithEmail() function to log in. We will save session and user infos to state and storage if signInWithEmail function return success. Then user will be redirected to profile page.
+On this page, we will show a form to log in with your email and password. We will use Altogic's `altogic.auth.signInWithEmail()` function to log in. We will save the session and user info to state and storage if the `signInWithEmail` function returns success. Then the user will be redirected to the profile page.
 
-Replacing pages/sign-in.js with the following code:
+Replacing `pages/sign-in.js` with the following code:
 ```javascript
 // /src/pages/sign-in.js
 import { useState } from "react";
@@ -399,13 +399,13 @@ export default SignInView;
 ```
 
 ### Register Page
-In this page, we will show a form to sign up with email and password. We will use Altogic's altogic.auth.signUpWithEmail() function to log in. 
+On this page, we will show a form to sign up with email and password. We will use Altogic's `altogic.auth.signUpWithEmail()` function to log in.
 
-We will save session and user infos to state and storage if signUpWithEmail function return user. Then user will be redirected to profile page.
+We will save the session and user info to state and storage if the `signUpWithEmail` function returns the user. The user will be redirected to the profile page.
 
-If signUpWithEmail does not return user, it means user need to confirm email so we will show the success message. 
+If `signUpWithEmail` does not return the user, it means the user must confirm the email so we will show the success message.
 
-Replacing pages/sign-up.js with the following code:
+Replacing `pages/sign-up.js` with the following code:
 ```javascript
 // /src/pages/sign-up.js
 import { useState } from "react";
@@ -508,11 +508,11 @@ export default SignUpView;
 ```
 
 ### Profile Page
-In this page, we will show the user's profile and We will use Altogic's altogic.auth.signOut() function to log out. 
+On this page, we will show the user's profile and use Altogic's `altogic.auth.signOut()` function to log out.
 
-We will remove session and user infos from state and storage if signOut function return success. Then user will be redirected to login page.
+We will remove session and user info from state and storage if the `signOut` function returns success. The user will be redirected to the login page.
 
-Replacing pages/profile.js with the following code:
+Replacing `pages/profile.js` with the following code:
 ```javascript
 // /src/pages/profile.js
 import { useNavigate } from "react-router-dom";
@@ -561,11 +561,11 @@ export default ProfileView;
 ```
 
 ### Auth Redirect Page
-We use this page for verify the user's email address and **Login With Magic Link Authentication.**
+We use this page to verify the user's email address and **Login With Magic Link Authentication.**
 
-We will use Altogic's altogic.auth.getAuthGrant() function to log in with handled token from url. 
+We will use Altogic's `altogic.auth.getAuthGrant()` function to log in with the handled token from the URL.
 
-Replacing pages/auth-redirect.js with the following code:
+Replacing `pages/auth-redirect.js` with the following code:
 ```javascript
 // /src/pages/auth-redirect.js
 import { useEffect } from "react";
@@ -607,12 +607,10 @@ function AuthRedirectView() {
 export default AuthRedirectView;
 ```
 
-### Login With Magic Link Page
-In this page, we will show a form to log in with Magic Link with only email. We will use Altogic's altogic.auth.sendMagicLinkEmail() function to log in.
+### Magic Link Page
+On this page, we will show a form to log in with Magic Link with only email. We will use Altogic's `altogic.auth.sendMagicLinkEmail()` function to log in.
 
-### How login With Magic Link Works
-
-If there is a user matching the entered email address, this function sends a link to that user by mail. and if the link in the e-mail is clicked, the user is logged in.
+If a user matches the entered email address, this function sends a link to that user by mail, and if the link in the e-mail is clicked, the user is logged in.
 
 ```javascript
 // /src/pages/magic-link.js
@@ -689,14 +687,13 @@ export default MagicLinkView;
 ```
 
 ## Updating User Info
-In this components, we will use Altogic's database operations to update the user fields and managing sessions.
+In these components, we will use Altogic's database operations to update user fields and manage sessions.
 
-
-Let's create some components in **src/components/** folder as below:
+Let's create some components in the **src/components/** folder as below:
 * UserInfo.js
 * Sessions.js
-
-Replacing components/UserInfo.js with the following code:
+  
+Replacing `components/UserInfo.js` with the following code:
 ```js
 // /src/components/UserInfo.js
 import { useRef, useState } from "react";
@@ -764,7 +761,7 @@ function UserInfo() {
 export default UserInfo;
 ```
 
-Replacing components/Sessions.js with the following code:
+Replacing `components/Sessions.js` with the following code:
 ```js
 // /src/components/Sessions.js
 import { useEffect, useState } from "react";
@@ -835,9 +832,9 @@ export default Sessions;
 ```
 
 ## Bonus: Upload Profile Photo
-Let's create a Avatar component for user can upload a profile photo. 
+Let's create an Avatar component for users can upload a profile photo.
 
-Open Avatar.js and paste the below code to create an avatar for the user. For convenience, we will be using the user's name as the name of the uploaded file and upload the profile picture to the root directory of our app storage. If needed you can create different buckets for each user or a generic bucket to store all provide photos of users. The Altogic Client Library has all the methods to manage buckets and files.
+Open `Avatar.js` and paste the below code to create an avatar for the user. For convenience, we will be using the user's name as the uploaded file's name and uploading the profile picture to the root directory of our app storage. If needed, you can create different buckets for each user or a generic bucket to store all provided photos of users. The Altogic Client Library has all the methods to manage buckets and files.
 
 ```javascript
 // /src/components/Avatar.js
