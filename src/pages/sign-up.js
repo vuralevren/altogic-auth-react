@@ -29,9 +29,9 @@ function SignUpView() {
       }
 
       if (session) {
-        navigate("/profile");
         setAuth(user);
         setSession(session);
+        navigate("/profile");
       } else {
         setSuccess(`We sent a verification link to ${inpEmail}`);
         setError(null);
