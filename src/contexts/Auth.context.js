@@ -8,17 +8,13 @@ const useFetchAuth = () => {
   const [fetchedSession, setFetchedSession] = useState(undefined);
 
   useEffect(() => {
-    // Check if user information is exist in db
-    altogic.auth
-      .getUserFromDB()
-      .then(({ user }) => {
-        setFetchedAuth(user);
-      })
-      .catch(() => setFetchedAuth(null));
+    // Check if user information is exist in storage
+    const userFromStorage = altogic.auth.getUser();
+    setFetchedAuth(userFromStorage);
 
     // Check if session information is exist in storage
     const sessionFromStorage = altogic.auth.getSession();
-    setFetchedSession(sessionFromStorage || null);
+    setFetchedSession(sessionFromStorage);
   }, []);
 
   return { fetchedAuth, fetchedSession };

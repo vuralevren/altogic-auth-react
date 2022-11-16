@@ -6,7 +6,7 @@ function UserInfo() {
   const { auth, setAuth } = useAuthContext();
   const inputRef = useRef();
 
-  const [inpName, setInpName] = useState("");
+  const [name, setName] = useState("");
 
   const [changeMode, setChangeMode] = useState(false);
   const [errors, setErrors] = useState(null);
@@ -25,7 +25,7 @@ function UserInfo() {
       const { data: updatedUser, errors: apiErrors } = await altogic.db
         .model("users")
         .object(auth._id)
-        .update({ name: inpName });
+        .update({ name });
 
       if (apiErrors) setErrors(apiErrors.items[0].message);
       else setAuth(updatedUser);
@@ -43,8 +43,8 @@ function UserInfo() {
             onKeyDown={handleKeyDown}
             type="text"
             className="border-none text-3xl text-center"
-            onChange={(e) => setInpName(e.target.value)}
-            value={inpName}
+            onChange={(e) => setName(e.target.value)}
+            value={name}
           />
         </div>
       ) : (

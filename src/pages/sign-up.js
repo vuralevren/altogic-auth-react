@@ -7,21 +7,19 @@ function SignUpView() {
   const { setAuth, setSession } = useAuthContext();
   const navigate = useNavigate();
 
-  const [inpName, setInpName] = useState("");
-  const [inpEmail, setInpEmail] = useState("");
-  const [inpPassword, setInpPassword] = useState("");
-
   const [loading, setLoading] = useState(false);
   const [success, setSuccess] = useState("");
   const [error, setError] = useState(null);
 
-  const handleSignUp = async () => {
+  const handleSignUp = async (e) => {
+    e.preventDefault();
+    const [name, email, password] = e.target;
     try {
       setLoading(true);
       const { user, session, errors } = await altogic.auth.signUpWithEmail(
-        inpEmail,
-        inpPassword,
-        inpName
+        email.value,
+        password.value,
+        name.value
       );
 
       if (errors) {
@@ -33,9 +31,12 @@ function SignUpView() {
         setSession(session);
         navigate("/profile");
       } else {
-        setSuccess(`We sent a verification link to ${inpEmail}`);
+        setSuccess(`We sent a verification link to ${email.value}`);
         setError(null);
         setLoading(false);
+        name.value = "";
+        email.value = "";
+        password.value = "";
       }
     } catch (err) {
       setSuccess(null);
@@ -46,7 +47,10 @@ function SignUpView() {
 
   return (
     <section className="flex flex-col items-center justify-center h-96 gap-4">
-      <div className="flex flex-col gap-2 w-full md:w-96">
+      <form
+        className="flex flex-col gap-2 w-full md:w-96"
+        onSubmit={handleSignUp}
+      >
         <h1 className="self-start text-3xl font-bold">Create an account</h1>
         {success && (
           <div className="bg-green-500 text-white p-2">{success}</div>
@@ -57,24 +61,12 @@ function SignUpView() {
           </div>
         ))}
 
-        <input
-          type="text"
-          placeholder="Type your name"
-          onChange={(e) => setInpName(e.target.value)}
-          value={inpName}
-        />
-        <input
-          type="email"
-          placeholder="Type your email"
-          onChange={(e) => setInpEmail(e.target.value)}
-          value={inpEmail}
-        />
+        <input type="text" placeholder="Type your name" />
+        <input type="email" placeholder="Type your email" />
         <input
           autoComplete="new-password"
           type="password"
           placeholder="Type your password"
-          onChange={(e) => setInpPassword(e.target.value)}
-          value={inpPassword}
         />
         <div className="flex justify-between gap-4">
           <Link className="text-indigo-600" to="/sign-in">
@@ -84,12 +76,11 @@ function SignUpView() {
             type="submit"
             className="border py-2 px-3 border-gray-500 hover:bg-gray-500 hover:text-white transition shrink-0"
             disabled={loading}
-            onClick={handleSignUp}
           >
             Register
           </button>
         </div>
-      </div>
+      </form>
     </section>
   );
 }
